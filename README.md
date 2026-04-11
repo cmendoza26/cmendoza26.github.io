@@ -1,5 +1,22 @@
-# cmendoza26.github.io
-Global Time App: Shows current time of selected cities.
-- Basic Features: Display local time, select city from dropdown, update every second.
-- Enhanced Features: Add/remove multiple cities, dark/light theme.
-- Advanced Features: Time zone conversion for events, world map with clickable cities
+# Global Time App
+## Features
+- **Live Time Display** - Shows current time for selected city, updated every second
+- **City Dropdown** - Select from 50+ world cities
+- **Timezone Accuracy** - Uses native `Intl.DateTimeFormat` API for accurate timezone handling
+- **Play/Pause Controls** - Pause and resume time updates
+- **Multi-City Management** - Add/remove multiple cities, view all times simultaneously
+- **Dark/Light Theme Toggle** - Persistent theme preference saved in browser
+## Project Structure
+
+```
+cmendoza26.github.io/
+├── index.html              # Main HTML with all UI sections
+├── css/
+│   ├── styles.css          # Base styles, layout, components
+│   └── theme.css           # Light/dark theme CSS variables
+├── js/
+│   ├── app.js              # Core application logic (all phases)
+│   ├── cities.js           # City data with timezone & coordinates
+│   └── map.js              # Map integration (currently unused)
+└── README.md               # This file
+```
