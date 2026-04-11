@@ -3,7 +3,7 @@ const appState = {
     cities: [],
     isRunning: true,
     updateInterval: null,
-    theme: 'light',
+    theme: 'dark',
     currentPhase: 1,
 };
 
@@ -46,7 +46,7 @@ function initializeApp() {
 }
 
 function loadSettings() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     appState.theme = savedTheme;
     
     const savedCities = localStorage.getItem('cities');
