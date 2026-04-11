@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Time App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div>
+                <h1>Global Time App</h1>
+                <p>View current time across the world</p>
+            </div>
+            <button id="theme-toggle" class="btn btn-secondary" title="Toggle dark/light theme">
+                <span id="theme-icon">🌙</span> Dark Mode
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Phase 1: City Selection & Display -->
+        <section id="basic-section" class="section">
+            <h2>Select a City</h2>
+            <div class="control-group">
+                <select id="city-select" aria-label="Select a city">
+                    <option value="">-- Choose a city --</option>
+                </select>
+                <button id="pause-btn" class="btn btn-secondary" title="Pause time updates">Pause</button>
+                <button id="resume-btn" class="btn btn-secondary" style="display:none;" title="Resume time updates">Resume</button>
+            </div>
+            <div id="time-display" class="time-display">
+                <div class="time-card">
+                    <h3 id="current-city">Select a city</h3>
+                    <div id="current-time" class="time-large">--:--:--</div>
+                    <div id="current-timezone" class="timezone-info">Timezone: UTC</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2: Multi-city Management (shown by default) -->
+        <section id="cities-section" class="section">
+            <h2>My Cities</h2>
+            <div class="control-group">
+                <button id="add-city-btn" class="btn btn-primary">+ Add City</button>
+                <button id="clear-all-btn" class="btn btn-secondary">Clear All</button>
+            </div>
+            <div id="cities-list" class="cities-list">
+                <!-- City cards will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Global Time App. Built with vanilla JS.</p>
+    </footer>
+
+    <!-- Toast notification container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/cities.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
