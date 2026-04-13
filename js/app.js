@@ -12,8 +12,6 @@ const dom = {
     currentCity: document.getElementById('current-city'),
     currentTime: document.getElementById('current-time'),
     currentTimezone: document.getElementById('current-timezone'),
-    pauseBtn: document.getElementById('pause-btn'),
-    resumeBtn: document.getElementById('resume-btn'),
     themeToggle: document.getElementById('theme-toggle'),
     themeIcon: document.getElementById('theme-icon'),
     basicSection: document.getElementById('basic-section'),
@@ -22,6 +20,7 @@ const dom = {
     clearAllBtn: document.getElementById('clear-all-btn'),
     citiesList: document.getElementById('cities-list'),
     toastContainer: document.getElementById('toast-container'),
+    clockCanvas: document.getElementById('3d-clock'),
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -77,12 +76,9 @@ function setupEventListeners() {
             setSelectedCity(cityName);
         }
     });
-    
-    dom.pauseBtn.addEventListener('click', pauseUpdates);
-    dom.resumeBtn.addEventListener('click', resumeUpdates);
-    
+
     dom.themeToggle?.addEventListener('click', toggleTheme);
-    
+
     dom.addCityBtn?.addEventListener('click', showAddCityDialog);
     dom.clearAllBtn?.addEventListener('click', clearAllCities);
 }
@@ -118,12 +114,13 @@ function updateTimeDisplay() {
         dom.currentCity.textContent = 'Select a city';
         dom.currentTime.textContent = '--:--:--';
         dom.currentTimezone.textContent = 'Timezone: UTC';
+        draw3DClock(null);
         return;
     }
-    
+
     const city = getCityByName(appState.selectedCity);
     if (!city) return;
-    
+
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: city.timezone,
@@ -132,38 +129,30 @@ function updateTimeDisplay() {
         second: '2-digit',
         hour12: false,
     });
-    
+
     const timeString = formatter.format(now);
-    
+
     dom.currentCity.textContent = city.name;
     dom.currentTime.textContent = timeString;
     dom.currentTimezone.textContent = `Timezone: ${city.timezone}`;
+
+    // Draw 3D clock with current time
+    const timeParts = timeString.split(':');
+    const hours = parseInt(timeParts[0]);
+    const minutes = parseInt(timeParts[1]);
+    const seconds = parseInt(timeParts[2]);
+    draw3DClock({ hours, minutes, seconds });
 }
 
 function startTimeUpdates() {
     updateTimeDisplay();
-    
+
     appState.updateInterval = setInterval(() => {
-        if (appState.isRunning) {
-            updateTimeDisplay();
-            if (appState.currentPhase >= 2) {
-                updateCitiesDisplay();
-            }
+        updateTimeDisplay();
+        if (appState.currentPhase >= 2) {
+            updateCitiesDisplay();
         }
     }, 1000);
-}
-
-function pauseUpdates() {
-    appState.isRunning = false;
-    dom.pauseBtn.style.display = 'none';
-    dom.resumeBtn.style.display = 'inline-block';
-}
-
-function resumeUpdates() {
-    appState.isRunning = true;
-    dom.pauseBtn.style.display = 'inline-block';
-    dom.resumeBtn.style.display = 'none';
-    updateTimeDisplay();
 }
 
 function activatePhase2() {
@@ -330,9 +319,9 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.textContent = message;
-    
+
     dom.toastContainer.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.classList.add('removing');
         setTimeout(() => {
@@ -341,27 +330,160 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+function draw3DClock(timeData) {
+    const canvas = dom.clockCanvas;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 80;
+
+    // Get computed colors from the document
+    const computedStyle = getComputedStyle(document.documentElement);
+    const bgColor = computedStyle.getPropertyValue('--bg-tertiary').trim();
+    const textPrimary = computedStyle.getPropertyValue('--text-primary').trim();
+    const textSecondary = computedStyle.getPropertyValue('--text-secondary').trim();
+    const borderColor = computedStyle.getPropertyValue('--border-color').trim();
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!timeData) {
+        // Draw placeholder
+        ctx.fillStyle = 'rgba(100, 100, 100, 0.2)';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fill();
+        return;
+    }
+
+    // Draw 3D clock face with depth effect
+    // Shadow/3D effect
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.beginPath();
+    ctx.ellipse(centerX + 2, centerY + 2, radius * 1.15, radius * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Clock face background with slight 3D effect
+    ctx.fillStyle = bgColor;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Clock border with 3D depth
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Inner circle for depth
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.95, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Draw hour markers
+    ctx.fillStyle = textPrimary;
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let i = 1; i <= 12; i++) {
+        const angle = (i * 30 - 90) * Math.PI / 180;
+        const x = centerX + Math.cos(angle) * (radius * 0.75);
+        const y = centerY + Math.sin(angle) * (radius * 0.75);
+        ctx.fillText(i, x, y);
+    }
+
+    // Draw minute markers
+    ctx.strokeStyle = textSecondary;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 60; i++) {
+        if (i % 5 !== 0) {
+            const angle = (i * 6 - 90) * Math.PI / 180;
+            const x1 = centerX + Math.cos(angle) * radius;
+            const x2 = centerX + Math.cos(angle) * (radius * 0.92);
+            const y1 = centerY + Math.sin(angle) * radius;
+            const y2 = centerY + Math.sin(angle) * (radius * 0.92);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+    }
+
+    const hours = timeData.hours % 12;
+    const minutes = timeData.minutes;
+    const seconds = timeData.seconds;
+
+    // Hour hand
+    const hourAngle = (hours * 30 + minutes * 0.5 - 90) * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(
+        centerX + Math.cos(hourAngle) * (radius * 0.5),
+        centerY + Math.sin(hourAngle) * (radius * 0.5)
+    );
+    ctx.strokeStyle = textPrimary;
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Minute hand
+    const minuteAngle = (minutes * 6 + seconds * 0.1 - 90) * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(
+        centerX + Math.cos(minuteAngle) * (radius * 0.65),
+        centerY + Math.sin(minuteAngle) * (radius * 0.65)
+    );
+    ctx.strokeStyle = textPrimary;
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    // Second hand
+    const secondAngle = (seconds * 6 - 90) * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(
+        centerX + Math.cos(secondAngle) * (radius * 0.7),
+        centerY + Math.sin(secondAngle) * (radius * 0.7)
+    );
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Center circle (3D effect)
+    ctx.fillStyle = textPrimary;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Center circle highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.beginPath();
+    ctx.arc(centerX - 2, centerY - 2, 4, 0, Math.PI * 2);
+    ctx.fill();
+}
+
 window.globalTimeApp = {
     // State
     getState: () => appState,
     getCities: getCityNames,
-    
+
     // City Management
     addCity: addCity,
     removeCity: removeCity,
     setSelectedCity: setSelectedCity,
     clearAllCities: clearAllCities,
-    
+
     // Theme
     toggleTheme: toggleTheme,
     getTheme: () => appState.theme,
-    
+
     // Phases
     activatePhase2: activatePhase2,
-    
-    // Controls
-    pauseUpdates: pauseUpdates,
-    resumeUpdates: resumeUpdates,
 };
 
 // Log available commands for development
@@ -375,6 +497,3 @@ console.log('  globalTimeApp.clearAllCities() - Clear all selected cities');
 console.log('%cTheme:', 'font-weight: bold;');
 console.log('  globalTimeApp.toggleTheme() - Switch dark/light mode');
 console.log('  globalTimeApp.getTheme() - Get current theme');
-console.log('%cControls:', 'font-weight: bold;');
-console.log('  globalTimeApp.pauseUpdates() - Pause timers');
-console.log('  globalTimeApp.resumeUpdates() - Resume timers');

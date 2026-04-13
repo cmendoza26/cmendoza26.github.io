@@ -9,31 +9,29 @@
 </head>
 <body>
     <header>
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-            <div>
+        <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">
+            <div style="text-align: center;">
                 <h1>Global Time App</h1>
                 <p>View current time across the world</p>
             </div>
-            <button id="theme-toggle" class="btn btn-secondary" title="Toggle dark/light theme">
-                <span id="theme-icon">🌙</span> Dark Mode
-            </button>
         </div>
     </header>
 
     <main>
         <!-- Phase 1: City Selection & Display -->
-        <section id="basic-section" class="section">
+        <section id="basic-section" class="section section-centered">
             <h2>Select a City</h2>
-            <div class="control-group">
+            <div class="control-group control-group-centered">
                 <select id="city-select" aria-label="Select a city">
                     <option value="">-- Choose a city --</option>
                 </select>
-                <button id="pause-btn" class="btn btn-secondary" title="Pause time updates">Pause</button>
-                <button id="resume-btn" class="btn btn-secondary" style="display:none;" title="Resume time updates">Resume</button>
             </div>
             <div id="time-display" class="time-display">
                 <div class="time-card">
                     <h3 id="current-city">Select a city</h3>
+                    <div class="clock-container">
+                        <canvas id="3d-clock" width="400" height="400"></canvas>
+                    </div>
                     <div id="current-time" class="time-large">--:--:--</div>
                     <div id="current-timezone" class="timezone-info">Timezone: UTC</div>
                 </div>
@@ -41,9 +39,9 @@
         </section>
 
         <!-- Phase 2: Multi-city Management (shown by default) -->
-        <section id="cities-section" class="section">
+        <section id="cities-section" class="section section-centered">
             <h2>My Cities</h2>
-            <div class="control-group">
+            <div class="control-group control-group-centered">
                 <button id="add-city-btn" class="btn btn-primary">+ Add City</button>
                 <button id="clear-all-btn" class="btn btn-secondary">Clear All</button>
             </div>
@@ -54,7 +52,9 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Global Time App. Built with vanilla JS.</p>
+        <button id="theme-toggle" class="btn btn-secondary" title="Toggle dark/light theme">
+            <span id="theme-icon">🌙</span> Dark Mode
+        </button>
     </footer>
 
     <!-- Toast notification container -->
