@@ -116,6 +116,11 @@ footer #theme-toggle {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
+}
+
+.section-centered h2 {
+    text-align: center;
 }
 
 .section h2 {
@@ -133,9 +138,13 @@ footer #theme-toggle {
 
 .control-group-centered {
     justify-content: center;
-    max-width: 400px;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.control-group-centered select {
+    max-width: 300px;
 }
 
 select, input[type="time"] {
@@ -229,7 +238,8 @@ select:disabled, input:disabled {
     padding: var(--spacing-xl);
     text-align: center;
     box-shadow: var(--shadow);
-    min-width: 300px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .time-card h3 {
@@ -274,6 +284,15 @@ select:disabled, input:disabled {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: var(--spacing-lg);
     margin-top: var(--spacing-lg);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cities-list > p {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin: var(--spacing-lg) 0;
 }
 
 .city-item {
