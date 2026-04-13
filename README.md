@@ -3,7 +3,6 @@
 - **Live Time Display** - Shows current time for selected city, updated every second
 - **City Dropdown** - Select from 50+ world cities
 - **Timezone Accuracy** - Uses native `Intl.DateTimeFormat` API for accurate timezone handling
-- **Play/Pause Controls** - Pause and resume time updates
 - **Multi-City Management** - Add/remove multiple cities, view all times simultaneously
 - **Dark/Light Theme Toggle** - Persistent theme preference saved in browser
 ## Project Structure
